@@ -5,6 +5,7 @@ public final class TestRunner {
         parsesCombinedAccessLogLine();
         flagsSuspiciousRequestPaths();
         summarizesLogLines();
+        formatsSummaryReport();
         System.out.println("All tests passed.");
     }
 
@@ -61,12 +62,32 @@ public final class TestRunner {
         assertEquals("admin login probe", summary.findings().getFirst().reason(), "first finding");
     }
 
+    private static void formatsSummaryReport() {
+        String line = "198.51.100.23 - - [08/Jul/2026:10:15:42 +0000] "
+                + "\"GET /admin/login.php HTTP/1.1\" 404 532 \"-\" \"curl/8.1\"";
+        TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(line));
+
+        String report = ReportFormatter.format(summary);
+
+        assertContains(report, "Parsed lines: 1", "parsed line report");
+        assertContains(report, "Malformed lines: 0", "malformed line report");
+        assertContains(report, "198.51.100.23: 1", "source ip report");
+        assertContains(report, "404: 1", "status code report");
+        assertContains(report, "admin login probe -> /admin/login.php", "finding report");
+    }
+
     private static void assertEquals(Object expected, Object actual, String label) {
         if (expected == null && actual == null) {
             return;
         }
         if (expected == null || !expected.equals(actual)) {
             throw new AssertionError(label + ": expected " + expected + " but got " + actual);
+        }
+    }
+
+    private static void assertContains(String text, String expected, String label) {
+        if (!text.contains(expected)) {
+            throw new AssertionError(label + ": expected report to contain " + expected + "\n" + text);
         }
     }
 }
