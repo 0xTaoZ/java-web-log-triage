@@ -27,9 +27,17 @@ make compile
 java -cp build/classes dev.tzheng.weblogtriage.Main /path/to/access.log
 ```
 
+`samples/access.log` contains a tiny mixed log with normal requests,
+suspicious paths, and one malformed line for testing the report.
+
+## Rule notes
+
+The first rule set is documented in [docs/rules.md](docs/rules.md). The rules
+are intentionally simple string checks, which makes them easy to inspect and
+extend while learning Java collections and text parsing.
+
 ## Why this exists
 
 This is a beginner-to-intermediate Java security utility, not a full SIEM. It
 is meant to make log parsing and detection logic concrete enough to test and
 modify while learning.
-

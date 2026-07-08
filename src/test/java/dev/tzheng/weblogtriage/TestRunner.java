@@ -52,7 +52,7 @@ public final class TestRunner {
         String third = "198.51.100.23 - - [08/Jul/2026:10:16:22 +0000] "
                 + "\"GET /../../etc/passwd HTTP/1.1\" 400 64 \"-\" \"curl/8.1\"";
 
-        TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(first, second, third, "bad line"));
+        TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(first, second, third, "bad line", ""));
 
         assertEquals(3, summary.parsedLines(), "parsed lines");
         assertEquals(1, summary.malformedLines(), "malformed lines");

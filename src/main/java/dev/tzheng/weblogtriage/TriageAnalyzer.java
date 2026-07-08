@@ -18,6 +18,9 @@ public final class TriageAnalyzer {
         List<Finding> findings = new ArrayList<>();
 
         for (String line : lines) {
+            if (line.isBlank()) {
+                continue;
+            }
             try {
                 LogEntry entry = ApacheLogParser.parse(line);
                 parsedLines++;
