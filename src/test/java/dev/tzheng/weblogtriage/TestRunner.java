@@ -58,6 +58,8 @@ public final class TestRunner {
         assertEquals(1, summary.malformedLines(), "malformed lines");
         assertEquals(2, summary.sourceIpCounts().get("198.51.100.23"), "ip count");
         assertEquals(1, summary.statusCodeCounts().get(404), "404 count");
+        assertEquals(2, summary.clientErrorSourceCounts().get("198.51.100.23"), "client error source count");
+        assertEquals(null, summary.clientErrorSourceCounts().get("203.0.113.10"), "non-error source count");
         assertEquals(2, summary.findings().size(), "finding count");
         assertEquals("admin login probe", summary.findings().getFirst().reason(), "first finding");
     }
@@ -73,6 +75,8 @@ public final class TestRunner {
         assertContains(report, "Malformed lines: 0", "malformed line report");
         assertContains(report, "198.51.100.23: 1", "source ip report");
         assertContains(report, "404: 1", "status code report");
+        assertContains(report, "Client error sources", "client error source header");
+        assertContains(report, "198.51.100.23: 1", "client error source report");
         assertContains(report, "admin login probe -> /admin/login.php", "finding report");
     }
 

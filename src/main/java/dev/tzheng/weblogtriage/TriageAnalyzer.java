@@ -15,6 +15,7 @@ public final class TriageAnalyzer {
         int malformedLines = 0;
         Map<String, Integer> sourceIpCounts = new LinkedHashMap<>();
         Map<Integer, Integer> statusCodeCounts = new LinkedHashMap<>();
+        Map<String, Integer> clientErrorSourceCounts = new LinkedHashMap<>();
         List<Finding> findings = new ArrayList<>();
 
         for (String line : lines) {
@@ -26,6 +27,9 @@ public final class TriageAnalyzer {
                 parsedLines++;
                 increment(sourceIpCounts, entry.ipAddress());
                 increment(statusCodeCounts, entry.statusCode());
+                if (isClientError(entry.statusCode())) {
+                    increment(clientErrorSourceCounts, entry.ipAddress());
+                }
 
                 Finding finding = SuspiciousRequestDetector.classify(entry.path());
                 if (finding != null) {
@@ -41,7 +45,12 @@ public final class TriageAnalyzer {
                 malformedLines,
                 Collections.unmodifiableMap(new LinkedHashMap<>(sourceIpCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(statusCodeCounts)),
+                Collections.unmodifiableMap(new LinkedHashMap<>(clientErrorSourceCounts)),
                 List.copyOf(findings));
+    }
+
+    private static boolean isClientError(int statusCode) {
+        return statusCode >= 400 && statusCode <= 499;
     }
 
     private static <T> void increment(Map<T, Integer> counts, T key) {

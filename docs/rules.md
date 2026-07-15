@@ -38,3 +38,8 @@ GET /admin/login.php HTTP/1.1
 Flags common WordPress endpoints such as `wp-login.php`, `xmlrpc.php`, and
 `/wp-admin`.
 
+## Client error sources
+
+Counts `4xx` responses by source IP. This is not a detection by itself, but it
+helps spot clients that are repeatedly probing missing, blocked, or invalid
+paths during a small lab review.
