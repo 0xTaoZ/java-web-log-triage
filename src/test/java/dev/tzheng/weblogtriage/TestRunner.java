@@ -51,15 +51,19 @@ public final class TestRunner {
                 + "\"POST /api/orders HTTP/1.1\" 200 1210 \"-\" \"Mozilla/5.0\"";
         String third = "198.51.100.23 - - [08/Jul/2026:10:16:22 +0000] "
                 + "\"GET /../../etc/passwd HTTP/1.1\" 400 64 \"-\" \"curl/8.1\"";
+        String fourth = "203.0.113.10 - - [08/Jul/2026:10:17:11 +0000] "
+                + "\"POST /api/orders HTTP/1.1\" 502 91 \"-\" \"Mozilla/5.0\"";
 
-        TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(first, second, third, "bad line", ""));
+        TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(first, second, third, fourth, "bad line", ""));
 
-        assertEquals(3, summary.parsedLines(), "parsed lines");
+        assertEquals(4, summary.parsedLines(), "parsed lines");
         assertEquals(1, summary.malformedLines(), "malformed lines");
         assertEquals(2, summary.sourceIpCounts().get("198.51.100.23"), "ip count");
         assertEquals(1, summary.statusCodeCounts().get(404), "404 count");
         assertEquals(2, summary.clientErrorSourceCounts().get("198.51.100.23"), "client error source count");
         assertEquals(null, summary.clientErrorSourceCounts().get("203.0.113.10"), "non-error source count");
+        assertEquals(1, summary.serverErrorSourceCounts().get("203.0.113.10"), "server error source count");
+        assertEquals(null, summary.serverErrorSourceCounts().get("198.51.100.23"), "non-server-error source count");
         assertEquals(2, summary.findings().size(), "finding count");
         assertEquals("admin login probe", summary.findings().getFirst().reason(), "first finding");
     }
@@ -77,6 +81,8 @@ public final class TestRunner {
         assertContains(report, "404: 1", "status code report");
         assertContains(report, "Client error sources", "client error source header");
         assertContains(report, "198.51.100.23: 1", "client error source report");
+        assertContains(report, "Server error sources", "server error source header");
+        assertContains(report, "- none", "empty server error source report");
         assertContains(report, "admin login probe -> /admin/login.php", "finding report");
     }
 

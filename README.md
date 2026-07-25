@@ -10,7 +10,7 @@ signals without external dependencies.
 
 - Parse common Apache/Nginx combined access log lines.
 - Flag a small set of suspicious request paths.
-- Summarize source IPs, status codes, repeated client-error sources, and
+- Summarize source IPs, status codes, repeated client/server-error sources, and
   findings from a local log file.
 - Keep the code buildable with only `javac` and `make`.
 
@@ -30,7 +30,8 @@ java -cp build/classes dev.tzheng.weblogtriage.Main /path/to/access.log
 
 `samples/access.log` contains a tiny mixed log with normal requests,
 suspicious paths, repeated 4xx responses from one source, and one malformed
-line for testing the report.
+line for testing the report. It also includes one 5xx response so the
+server-error source section is visible in the sample output.
 
 ## Rule notes
 

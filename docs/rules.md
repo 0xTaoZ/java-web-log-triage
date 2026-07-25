@@ -43,3 +43,9 @@ Flags common WordPress endpoints such as `wp-login.php`, `xmlrpc.php`, and
 Counts `4xx` responses by source IP. This is not a detection by itself, but it
 helps spot clients that are repeatedly probing missing, blocked, or invalid
 paths during a small lab review.
+
+## Server error sources
+
+Counts `5xx` responses by source IP. This can point to clients triggering
+backend errors or to routes that need reliability review during a lab incident
+walkthrough.
