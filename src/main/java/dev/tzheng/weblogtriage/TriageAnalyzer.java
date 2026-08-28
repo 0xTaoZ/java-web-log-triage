@@ -15,6 +15,7 @@ public final class TriageAnalyzer {
         int malformedLines = 0;
         Map<String, Integer> sourceIpCounts = new LinkedHashMap<>();
         Map<Integer, Integer> statusCodeCounts = new LinkedHashMap<>();
+        Map<String, Integer> methodStatusCounts = new LinkedHashMap<>();
         Map<String, Integer> clientErrorSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> serverErrorSourceCounts = new LinkedHashMap<>();
         List<Finding> findings = new ArrayList<>();
@@ -28,6 +29,7 @@ public final class TriageAnalyzer {
                 parsedLines++;
                 increment(sourceIpCounts, entry.ipAddress());
                 increment(statusCodeCounts, entry.statusCode());
+                increment(methodStatusCounts, entry.method() + " " + entry.statusCode());
                 if (isClientError(entry.statusCode())) {
                     increment(clientErrorSourceCounts, entry.ipAddress());
                 }
@@ -49,6 +51,7 @@ public final class TriageAnalyzer {
                 malformedLines,
                 Collections.unmodifiableMap(new LinkedHashMap<>(sourceIpCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(statusCodeCounts)),
+                Collections.unmodifiableMap(new LinkedHashMap<>(methodStatusCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(clientErrorSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(serverErrorSourceCounts)),
                 List.copyOf(findings));

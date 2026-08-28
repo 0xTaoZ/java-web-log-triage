@@ -8,6 +8,7 @@ public record TriageSummary(
         int malformedLines,
         Map<String, Integer> sourceIpCounts,
         Map<Integer, Integer> statusCodeCounts,
+        Map<String, Integer> methodStatusCounts,
         Map<String, Integer> clientErrorSourceCounts,
         Map<String, Integer> serverErrorSourceCounts,
         List<Finding> findings) {

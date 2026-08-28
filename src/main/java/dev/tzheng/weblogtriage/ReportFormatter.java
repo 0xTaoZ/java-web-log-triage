@@ -15,6 +15,7 @@ public final class ReportFormatter {
 
         appendCounts(report, "\nSource IPs", summary.sourceIpCounts());
         appendCounts(report, "\nStatus codes", summary.statusCodeCounts());
+        appendCounts(report, "\nMethod/status pairs", summary.methodStatusCounts());
         appendCounts(report, "\nClient error sources", summary.clientErrorSourceCounts());
         appendCounts(report, "\nServer error sources", summary.serverErrorSourceCounts());
 

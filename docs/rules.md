@@ -49,3 +49,9 @@ paths during a small lab review.
 Counts `5xx` responses by source IP. This can point to clients triggering
 backend errors or to routes that need reliability review during a lab incident
 walkthrough.
+
+## Method/status pairs
+
+Counts combinations such as `GET 404` or `POST 502`. This gives a small
+review hint about which HTTP methods are producing failures without needing a
+full query language.
