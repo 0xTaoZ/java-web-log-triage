@@ -23,5 +23,15 @@ public final class SuspiciousRequestDetector {
         }
         return null;
     }
-}
 
+    public static Finding classifyUserAgent(String userAgent) {
+        String lowerUserAgent = userAgent.toLowerCase(Locale.ROOT);
+        if (lowerUserAgent.contains("sqlmap")
+                || lowerUserAgent.contains("nikto")
+                || lowerUserAgent.contains("curl/")
+                || lowerUserAgent.contains("python-requests")) {
+            return new Finding("scanner user agent", userAgent);
+        }
+        return null;
+    }
+}

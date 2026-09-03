@@ -55,3 +55,10 @@ walkthrough.
 Counts combinations such as `GET 404` or `POST 502`. This gives a small
 review hint about which HTTP methods are producing failures without needing a
 full query language.
+
+## Scanner user agents
+
+Flags simple scanner or automation user agents such as `sqlmap`, `nikto`,
+`curl/`, and `python-requests`. This is a small lab-friendly signal, not a
+complete bot detector, because many normal tools can also send custom user
+agents.

@@ -18,6 +18,7 @@ public final class TriageAnalyzer {
         Map<String, Integer> methodStatusCounts = new LinkedHashMap<>();
         Map<String, Integer> clientErrorSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> serverErrorSourceCounts = new LinkedHashMap<>();
+        Map<String, Integer> userAgentCounts = new LinkedHashMap<>();
         List<Finding> findings = new ArrayList<>();
 
         for (String line : lines) {
@@ -30,6 +31,7 @@ public final class TriageAnalyzer {
                 increment(sourceIpCounts, entry.ipAddress());
                 increment(statusCodeCounts, entry.statusCode());
                 increment(methodStatusCounts, entry.method() + " " + entry.statusCode());
+                increment(userAgentCounts, entry.userAgent());
                 if (isClientError(entry.statusCode())) {
                     increment(clientErrorSourceCounts, entry.ipAddress());
                 }
@@ -40,6 +42,10 @@ public final class TriageAnalyzer {
                 Finding finding = SuspiciousRequestDetector.classify(entry.path());
                 if (finding != null) {
                     findings.add(finding);
+                }
+                Finding userAgentFinding = SuspiciousRequestDetector.classifyUserAgent(entry.userAgent());
+                if (userAgentFinding != null) {
+                    findings.add(userAgentFinding);
                 }
             } catch (IllegalArgumentException ignored) {
                 malformedLines++;
@@ -54,6 +60,7 @@ public final class TriageAnalyzer {
                 Collections.unmodifiableMap(new LinkedHashMap<>(methodStatusCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(clientErrorSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(serverErrorSourceCounts)),
+                Collections.unmodifiableMap(new LinkedHashMap<>(userAgentCounts)),
                 List.copyOf(findings));
     }
 

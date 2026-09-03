@@ -4,6 +4,7 @@ public final class TestRunner {
     public static void main(String[] args) {
         parsesCombinedAccessLogLine();
         flagsSuspiciousRequestPaths();
+        flagsScannerUserAgents();
         summarizesLogLines();
         formatsSummaryReport();
         System.out.println("All tests passed.");
@@ -44,6 +45,18 @@ public final class TestRunner {
         assertEquals(null, SuspiciousRequestDetector.classify("/assets/site.css"), "benign path");
     }
 
+    private static void flagsScannerUserAgents() {
+        assertEquals(
+                "scanner user agent",
+                SuspiciousRequestDetector.classifyUserAgent("sqlmap/1.8.4").reason(),
+                "sqlmap user agent reason");
+        assertEquals(
+                "scanner user agent",
+                SuspiciousRequestDetector.classifyUserAgent("python-requests/2.31.0").reason(),
+                "python requests user agent reason");
+        assertEquals(null, SuspiciousRequestDetector.classifyUserAgent("Mozilla/5.0"), "browser user agent");
+    }
+
     private static void summarizesLogLines() {
         String first = "198.51.100.23 - - [08/Jul/2026:10:15:42 +0000] "
                 + "\"GET /admin/login.php HTTP/1.1\" 404 532 \"-\" \"curl/8.1\"";
@@ -66,7 +79,9 @@ public final class TestRunner {
         assertEquals(null, summary.clientErrorSourceCounts().get("203.0.113.10"), "non-error source count");
         assertEquals(1, summary.serverErrorSourceCounts().get("203.0.113.10"), "server error source count");
         assertEquals(null, summary.serverErrorSourceCounts().get("198.51.100.23"), "non-server-error source count");
-        assertEquals(2, summary.findings().size(), "finding count");
+        assertEquals(2, summary.userAgentCounts().get("curl/8.1"), "curl user agent count");
+        assertEquals(2, summary.userAgentCounts().get("Mozilla/5.0"), "browser user agent count");
+        assertEquals(4, summary.findings().size(), "finding count");
         assertEquals("admin login probe", summary.findings().getFirst().reason(), "first finding");
     }
 
@@ -87,6 +102,8 @@ public final class TestRunner {
         assertContains(report, "198.51.100.23: 1", "client error source report");
         assertContains(report, "Server error sources", "server error source header");
         assertContains(report, "- none", "empty server error source report");
+        assertContains(report, "User agents", "user agent header");
+        assertContains(report, "curl/8.1: 1", "user agent report");
         assertContains(report, "admin login probe -> /admin/login.php", "finding report");
     }
 

@@ -18,6 +18,7 @@ public final class ReportFormatter {
         appendCounts(report, "\nMethod/status pairs", summary.methodStatusCounts());
         appendCounts(report, "\nClient error sources", summary.clientErrorSourceCounts());
         appendCounts(report, "\nServer error sources", summary.serverErrorSourceCounts());
+        appendCounts(report, "\nUser agents", summary.userAgentCounts());
 
         report.append("\nFindings\n");
         if (summary.findings().isEmpty()) {
