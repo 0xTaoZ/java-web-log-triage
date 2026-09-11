@@ -28,6 +28,12 @@ make compile
 java -cp build/classes dev.tzheng.weblogtriage.Main /path/to/access.log
 ```
 
+For a noisy log, limit each count section to the busiest values:
+
+```sh
+java -cp build/classes dev.tzheng.weblogtriage.Main --top 5 /path/to/access.log
+```
+
 `samples/access.log` contains a tiny mixed log with normal requests,
 suspicious paths, repeated 4xx responses from one source, and one malformed
 line for testing the report. It also includes one 5xx response so the

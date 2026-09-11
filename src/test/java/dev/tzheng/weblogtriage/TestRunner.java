@@ -7,6 +7,7 @@ public final class TestRunner {
         flagsScannerUserAgents();
         summarizesLogLines();
         formatsSummaryReport();
+        limitsCountSections();
         System.out.println("All tests passed.");
     }
 
@@ -105,6 +106,21 @@ public final class TestRunner {
         assertContains(report, "User agents", "user agent header");
         assertContains(report, "curl/8.1: 1", "user agent report");
         assertContains(report, "admin login probe -> /admin/login.php", "finding report");
+    }
+
+    private static void limitsCountSections() {
+        String first = "198.51.100.23 - - [08/Jul/2026:10:15:42 +0000] "
+                + "\"GET /admin/login.php HTTP/1.1\" 404 532 \"-\" \"curl/8.1\"";
+        String second = "198.51.100.23 - - [08/Jul/2026:10:16:42 +0000] "
+                + "\"GET /wp-login.php HTTP/1.1\" 404 532 \"-\" \"curl/8.1\"";
+        String third = "203.0.113.10 - - [08/Jul/2026:10:17:42 +0000] "
+                + "\"GET /index.html HTTP/1.1\" 200 840 \"-\" \"Mozilla/5.0\"";
+        TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(first, second, third));
+
+        String report = ReportFormatter.format(summary, 1);
+
+        assertContains(report, "198.51.100.23: 2", "top source ip report");
+        assertContains(report, "- ... 1 more", "hidden count report");
     }
 
     private static void assertEquals(Object expected, Object actual, String label) {
