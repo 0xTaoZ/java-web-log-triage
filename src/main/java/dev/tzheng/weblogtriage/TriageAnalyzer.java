@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class TriageAnalyzer {
@@ -19,6 +20,7 @@ public final class TriageAnalyzer {
         Map<String, Integer> clientErrorSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> serverErrorSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> userAgentCounts = new LinkedHashMap<>();
+        Map<String, Integer> requestExtensionCounts = new LinkedHashMap<>();
         List<Finding> findings = new ArrayList<>();
 
         for (String line : lines) {
@@ -32,6 +34,10 @@ public final class TriageAnalyzer {
                 increment(statusCodeCounts, entry.statusCode());
                 increment(methodStatusCounts, entry.method() + " " + entry.statusCode());
                 increment(userAgentCounts, entry.userAgent());
+                String extension = requestExtension(entry.path());
+                if (extension != null) {
+                    increment(requestExtensionCounts, extension);
+                }
                 if (isClientError(entry.statusCode())) {
                     increment(clientErrorSourceCounts, entry.ipAddress());
                 }
@@ -61,7 +67,18 @@ public final class TriageAnalyzer {
                 Collections.unmodifiableMap(new LinkedHashMap<>(clientErrorSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(serverErrorSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(userAgentCounts)),
+                Collections.unmodifiableMap(new LinkedHashMap<>(requestExtensionCounts)),
                 List.copyOf(findings));
+    }
+
+    private static String requestExtension(String path) {
+        String cleanPath = path.split("\\?", 2)[0];
+        int slash = cleanPath.lastIndexOf('/');
+        int dot = cleanPath.lastIndexOf('.');
+        if (dot <= slash || dot == cleanPath.length() - 1) {
+            return null;
+        }
+        return cleanPath.substring(dot + 1).toLowerCase(Locale.ROOT);
     }
 
     private static boolean isClientError(int statusCode) {

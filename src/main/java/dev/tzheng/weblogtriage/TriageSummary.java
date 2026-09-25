@@ -12,5 +12,6 @@ public record TriageSummary(
         Map<String, Integer> clientErrorSourceCounts,
         Map<String, Integer> serverErrorSourceCounts,
         Map<String, Integer> userAgentCounts,
+        Map<String, Integer> requestExtensionCounts,
         List<Finding> findings) {
 }

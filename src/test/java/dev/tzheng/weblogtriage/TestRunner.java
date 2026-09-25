@@ -82,6 +82,8 @@ public final class TestRunner {
         assertEquals(null, summary.serverErrorSourceCounts().get("198.51.100.23"), "non-server-error source count");
         assertEquals(2, summary.userAgentCounts().get("curl/8.1"), "curl user agent count");
         assertEquals(2, summary.userAgentCounts().get("Mozilla/5.0"), "browser user agent count");
+        assertEquals(1, summary.requestExtensionCounts().get("php"), "php extension count");
+        assertEquals(null, summary.requestExtensionCounts().get("orders"), "extensionless path count");
         assertEquals(4, summary.findings().size(), "finding count");
         assertEquals("admin login probe", summary.findings().getFirst().reason(), "first finding");
     }
@@ -105,6 +107,8 @@ public final class TestRunner {
         assertContains(report, "- none", "empty server error source report");
         assertContains(report, "User agents", "user agent header");
         assertContains(report, "curl/8.1: 1", "user agent report");
+        assertContains(report, "Request extensions", "request extension header");
+        assertContains(report, "php: 1", "request extension report");
         assertContains(report, "admin login probe -> /admin/login.php", "finding report");
     }
 

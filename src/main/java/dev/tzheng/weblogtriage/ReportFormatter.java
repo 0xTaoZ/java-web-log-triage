@@ -24,6 +24,7 @@ public final class ReportFormatter {
         appendCounts(report, "\nClient error sources", summary.clientErrorSourceCounts(), limit);
         appendCounts(report, "\nServer error sources", summary.serverErrorSourceCounts(), limit);
         appendCounts(report, "\nUser agents", summary.userAgentCounts(), limit);
+        appendCounts(report, "\nRequest extensions", summary.requestExtensionCounts(), limit);
 
         report.append("\nFindings\n");
         if (summary.findings().isEmpty()) {

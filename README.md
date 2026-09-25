@@ -11,7 +11,8 @@ signals without external dependencies.
 - Parse common Apache/Nginx combined access log lines.
 - Flag a small set of suspicious request paths.
 - Summarize source IPs, status codes, method/status pairs, repeated
-  client/server-error sources, user agents, and findings from a local log file.
+  client/server-error sources, user agents, request extensions, and findings
+  from a local log file.
 - Keep the code buildable with only `javac` and `make`.
 
 ## Usage
