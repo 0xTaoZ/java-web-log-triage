@@ -20,6 +20,7 @@ public final class TriageAnalyzer {
         Map<String, Integer> clientErrorSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> serverErrorSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> userAgentCounts = new LinkedHashMap<>();
+        Map<String, Integer> flaggedRequestSourceCounts = new LinkedHashMap<>();
         Map<String, Integer> requestExtensionCounts = new LinkedHashMap<>();
         List<Finding> findings = new ArrayList<>();
 
@@ -53,6 +54,9 @@ public final class TriageAnalyzer {
                 if (userAgentFinding != null) {
                     findings.add(userAgentFinding);
                 }
+                if (finding != null || userAgentFinding != null) {
+                    increment(flaggedRequestSourceCounts, entry.ipAddress());
+                }
             } catch (IllegalArgumentException ignored) {
                 malformedLines++;
             }
@@ -67,6 +71,7 @@ public final class TriageAnalyzer {
                 Collections.unmodifiableMap(new LinkedHashMap<>(clientErrorSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(serverErrorSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(userAgentCounts)),
+                Collections.unmodifiableMap(new LinkedHashMap<>(flaggedRequestSourceCounts)),
                 Collections.unmodifiableMap(new LinkedHashMap<>(requestExtensionCounts)),
                 List.copyOf(findings));
     }

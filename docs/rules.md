@@ -62,3 +62,9 @@ Flags simple scanner or automation user agents such as `sqlmap`, `nikto`,
 `curl/`, and `python-requests`. This is a small lab-friendly signal, not a
 complete bot detector, because many normal tools can also send custom user
 agents.
+
+## Flagged request sources
+
+Counts each source IP once per request when either the path or user agent
+matches a rule. This helps prioritize sources for review without double-counting
+a request that triggers both detectors.
