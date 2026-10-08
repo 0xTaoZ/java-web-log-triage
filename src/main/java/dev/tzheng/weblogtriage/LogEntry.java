@@ -6,7 +6,7 @@ public record LogEntry(
         String method,
         String path,
         int statusCode,
-        int bytesSent,
+        long bytesSent,
         String referer,
         String userAgent) {
 }

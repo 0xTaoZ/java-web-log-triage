@@ -8,7 +8,9 @@ signals without external dependencies.
 
 ## Current scope
 
-- Parse common Apache/Nginx combined access log lines.
+- Parse common Apache/Nginx combined access log lines, including escaped quotes
+  in the user agent or referrer, empty `"-"` requests, requests without an HTTP
+  version, and response sizes above 2 GiB.
 - Flag a small set of suspicious request paths.
 - Summarize source IPs, status codes, method/status pairs, repeated
   client/server-error sources, user agents, flagged request sources, request

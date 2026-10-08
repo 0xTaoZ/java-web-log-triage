@@ -3,6 +3,7 @@ package dev.tzheng.weblogtriage;
 public final class TestRunner {
     public static void main(String[] args) {
         parsesCombinedAccessLogLine();
+        parsesEscapedQuotesAndUnusualRequestLines();
         flagsSuspiciousRequestPaths();
         flagsScannerUserAgents();
         summarizesLogLines();
@@ -22,8 +23,30 @@ public final class TestRunner {
         assertEquals("GET", entry.method(), "method");
         assertEquals("/admin/login.php", entry.path(), "path");
         assertEquals(404, entry.statusCode(), "status");
-        assertEquals(532, entry.bytesSent(), "bytes sent");
+        assertEquals(532L, entry.bytesSent(), "bytes sent");
         assertEquals("curl/8.1", entry.userAgent(), "user agent");
+    }
+
+    private static void parsesEscapedQuotesAndUnusualRequestLines() {
+        // A scanner that puts a quote in its user agent must not be dropped as malformed.
+        LogEntry injected = ApacheLogParser.parse("198.51.100.23 - - [08/Jul/2026:10:15:42 +0000] "
+                + "\"GET /search?q=1 HTTP/1.1\" 200 10 \"-\" \"sqlmap/1.8 \\\" OR 1=1 --\"");
+        assertEquals("sqlmap/1.8 \" OR 1=1 --", injected.userAgent(), "unescaped user agent");
+        assertEquals("scanner user agent",
+                SuspiciousRequestDetector.classifyUserAgent(injected.userAgent()).reason(), "escaped agent still flagged");
+
+        LogEntry empty = ApacheLogParser.parse("203.0.113.10 - - [08/Jul/2026:10:16:01 +0000] "
+                + "\"-\" 408 0 \"-\" \"-\"");
+        assertEquals("-", empty.method(), "empty request method");
+        assertEquals(408, empty.statusCode(), "empty request status");
+
+        LogEntry noVersion = ApacheLogParser.parse("203.0.113.10 - - [08/Jul/2026:10:16:02 +0000] "
+                + "\"GET /../../etc/passwd\" 400 0 \"-\" \"-\"");
+        assertEquals("/../../etc/passwd", noVersion.path(), "path without HTTP version");
+
+        LogEntry large = ApacheLogParser.parse("203.0.113.10 - - [08/Jul/2026:10:16:03 +0000] "
+                + "\"GET /backup.tar HTTP/1.1\" 200 5368709120 \"-\" \"curl/8.1\"");
+        assertEquals(5368709120L, large.bytesSent(), "bytes above 2 GiB");
     }
 
     private static void flagsSuspiciousRequestPaths() {
