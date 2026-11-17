@@ -48,6 +48,9 @@ public final class ApacheLogParser {
         if ("-".equals(value)) {
             return 0;
         }
+        if (!value.matches("[0-9]+")) {
+            throw new IllegalArgumentException("invalid response size: " + value);
+        }
         return Long.parseLong(value);
     }
 

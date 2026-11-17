@@ -10,7 +10,9 @@ signals without external dependencies.
 
 - Parse common Apache/Nginx combined access log lines, including escaped quotes
   in the user agent or referrer, empty `"-"` requests, requests without an HTTP
-  version, and response sizes above 2 GiB.
+  version, and response sizes above 2 GiB. Response sizes must be ASCII decimal
+  digits within the signed 64-bit range, or `-` for an absent size. Invalid sizes
+  count as malformed lines and are excluded from summaries and findings.
 - Flag a small set of suspicious request paths.
 - Summarize source IPs, status codes, method/status pairs, repeated
   client/server-error sources, user agents, flagged request sources, request

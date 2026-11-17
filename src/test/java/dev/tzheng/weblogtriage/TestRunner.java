@@ -4,6 +4,7 @@ public final class TestRunner {
     public static void main(String[] args) {
         parsesCombinedAccessLogLine();
         parsesEscapedQuotesAndUnusualRequestLines();
+        validatesResponseSizes();
         flagsSuspiciousRequestPaths();
         flagsScannerUserAgents();
         summarizesLogLines();
@@ -47,6 +48,33 @@ public final class TestRunner {
         LogEntry large = ApacheLogParser.parse("203.0.113.10 - - [08/Jul/2026:10:16:03 +0000] "
                 + "\"GET /backup.tar HTTP/1.1\" 200 5368709120 \"-\" \"curl/8.1\"");
         assertEquals(5368709120L, large.bytesSent(), "bytes above 2 GiB");
+    }
+
+    private static void validatesResponseSizes() {
+        String prefix = "198.51.100.23 - - [08/Jul/2026:10:15:42 +0000] "
+                + "\"GET /admin/login.php HTTP/1.1\" 404 ";
+        String suffix = " \"-\" \"curl/8.1\"";
+        String[] valid = {"-", "0", "00012", "5368709120", "9223372036854775807"};
+        long[] expected = {0L, 0L, 12L, 5368709120L, Long.MAX_VALUE};
+        for (int i = 0; i < valid.length; i++) {
+            assertEquals(expected[i], ApacheLogParser.parse(prefix + valid[i] + suffix).bytesSent(),
+                    "valid response size " + valid[i]);
+        }
+        for (String value : new String[] {"-1", "-0", "+1", "١٢", "１２", "1.0", "12x", "9223372036854775808"}) {
+            String line = prefix + value + suffix;
+            boolean rejected = false;
+            try {
+                ApacheLogParser.parse(line);
+            } catch (IllegalArgumentException expectedError) {
+                rejected = true;
+            }
+            assertEquals(true, rejected, "invalid response size " + value);
+            TriageSummary summary = TriageAnalyzer.analyze(java.util.List.of(line, prefix + "0" + suffix));
+            assertEquals(1, summary.malformedLines(), "invalid size counted as malformed");
+            assertEquals(1, summary.parsedLines(), "valid record after malformed size");
+            assertEquals(1, summary.sourceIpCounts().get("198.51.100.23"), "invalid size excluded from sources");
+            assertEquals(1, summary.flaggedRequestSourceCounts().get("198.51.100.23"), "invalid size excluded from flagged sources");
+        }
     }
 
     private static void flagsSuspiciousRequestPaths() {
